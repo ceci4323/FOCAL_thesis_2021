@@ -1,0 +1,129 @@
+setwd("/Users/ceciliethystrup/OneDrive/Dokumenter/DTU/Speciale E21/Systematic review/Metaanalysis/new_numbers_jan")
+library(meta)
+library(metafor)
+library(ggplot2)
+library(gridExtra)
+library(dmetar)
+library(tidyverse)
+
+#### Loading in files
+df_rota <- read.csv("rota.csv", sep = ',')
+df_noro <- read.csv("noro.csv", sep = ',')
+df_astro <- read.csv("astro.csv", sep = ',')
+df_campy <- read.csv("campy.csv", sep = ',')
+df_crypto <- read.csv("crypto.csv", sep = ',')
+df_shige <- read.csv("shige.csv", sep = ',')
+df_salmo <- read.csv("salmo.csv", sep = ',')
+df_etec <- read.csv("etec.csv", sep = ',')
+df_epec <- read.csv("epec.csv", sep = ',')
+df_eiec <- read.csv("eiec.csv", sep = ',')
+df_eaec <- read.csv("eaec.csv", sep = ',')
+df_stec <- read.csv("stec.csv", sep = ',')
+df_vibrio <- read.csv("vibrio.csv", sep = ',')
+df_enta <- read.csv("enta.csv", sep = ',')
+df_ehec <- read.csv("ehec.csv", sep = ',')
+
+df <- subset(df_noro,Typestudy_new=='OUT')
+df <- subset(df, Age.Group=='<5')
+
+m.gen=metaprop(n, t, studlab=paste(df$Study_number, df$First.Author.Last.Name, df$Year.of.Publication, sep=", "), 
+               data=df, 
+               sm="PLOGIT", 
+               method ="GLMM",
+               random = TRUE,
+               fixed = FALSE,
+               hakn = TRUE,
+               title = "Prevalence")
+
+
+
+#outlier analysis
+outliers = find.outliers(m.gen)
+print(outliers)
+forest(outliers$m.random)
+
+#influence analysis
+m.gen.inf <- InfluenceAnalysis(m.gen, random = TRUE)
+plot(m.gen.inf, "baujat")
+
+plot(m.gen.inf, "influence")
+
+plot(m.gen.inf, "es")
+plot(m.gen.inf, "i2")
+
+#The predictor, the region and sample site, does indeed influence the studies’ 
+# effect size, if only a little (p-val = 0.0568)
+
+
+png(filename='pooled_rota_forest.png', height = 600, width=800)
+m_rota_strat <- metaprop(n, t, Study_number, random=F, subgroup=Region, 
+                         subgroup.name="Region", sep.subgroup=": ", data=df_rota)
+forest(m_rota_strat, layout = "subgroup" )
+dev.off()
+
+
+# Produce funnel plot
+funnel.meta(m.gen,
+            xlim = c(-6, 2),
+            studlab = TRUE)
+
+#MODERATOR ANALYSIS
+
+#rota
+#df<-subset(df, Study_number!="1aG1" & Study_number!="1cG1" & Study_number!="1dG1" & Study_number!="1aG2" & Study_number!="1bG2" & Study_number!="1cG2")
+#df<-subset(df, Study_number!="11G6" & Study_number!="1aG5" & Study_number!="1bG5" & Study_number!="1cG5" & Study_number!="2G5" & Study_number!="3bG6" & Study_number!="4G1" & Study_number!="5bG6" & Study_number!="6bG6")
+#noro
+df<-subset(df, Study_number!="1cG1" & Study_number!="1dG1" & Study_number!="1G4")
+#df<-subset(df, Study_number!="4aG4" & Study_number!="5bG6" & Study_number!="5cG6")
+#astro
+#df<-subset(df, Study_number!="1aG5" & Study_number!="3aG6")
+#campy
+#df<-subset(df, Study_number!="3bG6")
+#df<-subset(df, Study_number!="1G3" & Study_number!="3aG6" & Study_number!="6bG6")
+#crypto
+#df<-subset(df, Study_number!="4G1" & Study_number!="4bG4" & Study_number!="4G5")
+#df<-subset(df, Study_number!="1aG1" & Study_number!="1cG1" & Study_number!="3G3" & Study_number!="6aG6")
+#enta
+#df<-subset(df, Study_number!="3bG5")
+#df<-subset(df, Study_number!="4aG4" & Study_number!="4bG4" & Study_number!="4cG4")
+#epec
+#df<-subset(df, Study_number!="4G6")
+#etec
+#df<-subset(df, Study_number!="2G5" & Study_number!="4G3" & Study_number!="7G4")
+#salmo
+#df<-subset(df, Study_number!="2aG1" & Study_number!="2G5")
+#shige
+#df<-subset(df, Study_number!="4G1" & Study_number!="2G5" & Study_number!="4cG4" & Study_number!="6bG6")
+
+
+ies=escalc(xi=n, ni=t, data=df, measure="PR")
+
+m.gen=metaprop(n, t, studlab=paste(df$Study_number, df$First.Author.Last.Name, df$Year.of.Publication, sep=", "), 
+               data=df, 
+               sm="PLOGIT", 
+               method ="GLMM",
+               random = TRUE,
+               fixed = FALSE,
+               hakn = TRUE,
+               title = "Prevalence")
+
+upmeg <- update.meta(m.gen, 
+            subgroup = Region, 
+            tau.common = TRUE)
+
+print(upmeg, digits=3)
+
+upmeg <- update.meta(m.gen, 
+                     subgroup = Urban..rural..mixed., 
+                     tau.common = TRUE)
+
+print(upmeg, digits=3)
+
+res <- rma(yi, vi, mods = ~ 0 + factor(Region), data=ies)
+print(res, digits=3)
+
+res <- rma(yi, vi, mods = ~ 0 + factor(Urban..rural..mixed.), data=ies)
+print(res, digits=3)
+
+
+
