@@ -1,0 +1,27 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import os, sys
+import numpy as np
+import gzip
+import seaborn as sns
+
+bacteriadb = '/Users/ceciliethystrup/OneDrive/Dokumenter/DTU/Speciale E21/Metagenomics data/second_run/bacteria.tax'
+bacteria_draftdb = '/Users/ceciliethystrup/OneDrive/Dokumenter/DTU/Speciale E21/Metagenomics data/second_run/bacteria_draft.tax'
+fungidb = '/Users/ceciliethystrup/OneDrive/Dokumenter/DTU/Speciale E21/Metagenomics data/second_run/fungi.tax'
+archeadb = '/Users/ceciliethystrup/OneDrive/Dokumenter/DTU/Speciale E21/Metagenomics data/second_run/archaea.tax'
+virusdb = '/Users/ceciliethystrup/OneDrive/Dokumenter/DTU/Speciale E21/Metagenomics data/second_run/virus.tax'
+plasmiddb = '/Users/ceciliethystrup/OneDrive/Dokumenter/DTU/Speciale E21/Metagenomics data/second_run/plasmid.tax'
+protozoadb = '/Users/ceciliethystrup/OneDrive/Dokumenter/DTU/Speciale E21/Metagenomics data/second_run/protozoa.tax2'
+
+bacteriadb = pd.read_csv(bacteriadb, sep='\t')
+bacteria_draftdb = pd.read_csv(bacteria_draftdb, sep='\t')
+fungidb = pd.read_csv(fungidb, sep='\t')
+archeadb = pd.read_csv(archeadb, sep='\t')
+virusdb = pd.read_csv(virusdb, sep='\t')
+plasmiddb = pd.read_csv(plasmiddb, sep='\t')
+protozoadb = pd.read_csv(protozoadb, 
+frames = [bacteriadb, bacteria_draftdb, fungidb, archeadb, virusdb, plasmiddb, protozoadb]
+ref_db = pd.concat(frames)
+
+
+ref_db.to_csv('taxonomy_new.db', index=False, sep='\t')
