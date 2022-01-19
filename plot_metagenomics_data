@@ -1,0 +1,597 @@
+import pandas as pd
+import os, sys
+import numpy as np
+import gzip
+import seaborn as sns
+import functools
+
+from matplotlib import pyplot as plt
+plt.style.use('ggplot')
+
+path = '/Users/ceciliethystrup/OneDrive/Dokumenter/DTU/Speciale E21/Metagenomics data/new_database_files/genomic/'
+
+fpkm_df_1009182 = pd.read_csv(path + '1009182_clr_values_species.tab', sep='\t')
+fpkm_df_1009182.name = '1009182'
+fpkm_df_1009183 = pd.read_csv(path + '1009183_clr_values_species.tab', sep='\t')
+fpkm_df_1009183.name = '1009183'
+fpkm_df_1009184 = pd.read_csv(path + '1009184_clr_values_species.tab', sep='\t')
+fpkm_df_1009184.name = '1009184'
+fpkm_df_1009185 = pd.read_csv(path + '1009185_clr_values_species.tab', sep='\t')
+fpkm_df_1009185.name = '1009185'
+fpkm_df_1009186 = pd.read_csv(path + '1009186_clr_values_species.tab', sep='\t')
+fpkm_df_1009186.name = '1009186'
+fpkm_df_1009187 = pd.read_csv(path + '1009187_clr_values_species.tab', sep='\t')
+fpkm_df_1009187.name = '1009187'
+fpkm_df_1009188 = pd.read_csv(path + '1009188_clr_values_species.tab', sep='\t')
+fpkm_df_1009188.name = '1009188'
+fpkm_df_1009189 = pd.read_csv(path + '1009189_clr_values_species.tab', sep='\t')
+fpkm_df_1009189.name = '1009189'
+fpkm_df_1009190 = pd.read_csv(path + '1009190_clr_values_species.tab', sep='\t')
+fpkm_df_1009190.name = '1009190'
+fpkm_df_1009191 = pd.read_csv(path + '1009191_clr_values_species.tab', sep='\t')
+fpkm_df_1009191.name = '1009191'
+fpkm_df_1009192 = pd.read_csv(path + '1009192_clr_values_species.tab', sep='\t')
+fpkm_df_1009192.name = '1009192'
+fpkm_df_1009193 = pd.read_csv(path + '1009193_clr_values_species.tab', sep='\t')
+fpkm_df_1009193.name = '1009193'
+fpkm_df_1009194 = pd.read_csv(path + '1009194_clr_values_species.tab', sep='\t')
+fpkm_df_1009194.name = '1009194'
+fpkm_df_1009195 = pd.read_csv(path + '1009195_clr_values_species.tab', sep='\t')
+fpkm_df_1009195.name = '1009195'
+fpkm_df_1009196 = pd.read_csv(path + '1009196_clr_values_species.tab', sep='\t')
+fpkm_df_1009196.name = '1009196'
+fpkm_df_1009197 = pd.read_csv(path + '1009197_clr_values_species.tab', sep='\t')
+fpkm_df_1009197.name = '1009197'
+fpkm_df_1009198 = pd.read_csv(path + '1009198_clr_values_species.tab', sep='\t')
+fpkm_df_1009198.name = '1009198'
+fpkm_df_1009200 = pd.read_csv(path + '1009200_clr_values_species.tab', sep='\t')
+fpkm_df_1009200.name = '1009200'
+fpkm_df_1009201 = pd.read_csv(path + '1009201_clr_values_species.tab', sep='\t')
+fpkm_df_1009201.name = '1009201'
+fpkm_df_1009202 = pd.read_csv(path + '1009202_clr_values_species.tab', sep='\t')
+fpkm_df_1009202.name = '1009202'
+fpkm_df_1009203 = pd.read_csv(path + '1009203_clr_values_species.tab', sep='\t')
+fpkm_df_1009203.name = '1009203'
+
+list_of_pandas = [fpkm_df_1009182, fpkm_df_1009183, fpkm_df_1009184, fpkm_df_1009185, fpkm_df_1009186, fpkm_df_1009187, fpkm_df_1009188, fpkm_df_1009189, fpkm_df_1009190, fpkm_df_1009191, fpkm_df_1009192, fpkm_df_1009193, fpkm_df_1009194, fpkm_df_1009195, fpkm_df_1009196, fpkm_df_1009197, fpkm_df_1009198, fpkm_df_1009200, fpkm_df_1009201, fpkm_df_1009202, fpkm_df_1009203]
+
+###############################################################################################
+# Add information to dataframes
+country_dict = {
+    '1009182': 'Tanzania',
+    '1009183': 'Nigeria',
+    '1009184': 'Nigeria',
+    '1009185': 'Ethiopia',
+    '1009186': 'Ethiopia',
+    '1009187': 'Mozambique',
+    '1009188': 'Mozambique',
+    '1009189': 'Mozambique',
+    '1009190': 'Mozambique',
+    '1009191': 'Tanzania',
+    '1009192': 'Nigeria',
+    '1009193': 'Nigeria',
+    '1009194': 'Ethiopia',
+    '1009195': 'Ethiopia',
+    '1009196': 'Mozambique',
+    '1009197': 'Mozambique',
+    '1009198': 'Mozambique',
+    '1009200': 'Nigeria',
+    '1009201': 'Nigeria',
+    '1009202': 'Ethiopia',
+    '1009203': 'Ethiopia'
+    }
+
+urban_rural_dict = {
+    '1009182': 'Urban',
+    '1009183': 'Urban',
+    '1009184': 'Rural',
+    '1009185': 'Urban',
+    '1009186': 'Rural',
+    '1009187': 'Rural',
+    '1009188': 'Rural',
+    '1009189': 'Urban',
+    '1009190': 'Urban',
+    '1009191': 'Rural',
+    '1009192': 'Urban',
+    '1009193': 'Rural',
+    '1009194': 'Rural',
+    '1009195': 'Urban',
+    '1009196': 'Rural',
+    '1009197': 'Rural',
+    '1009198': 'Urban',
+    '1009200': 'Urban',
+    '1009201': 'Rural',
+    '1009202': 'Urban',
+    '1009203': 'Rural'
+    }
+
+selected_vfs = [
+    'yopE',
+    'yopH',
+    'yopO/ypkA',
+    'yopM',
+    'yopJ/yopP',
+    'yopT'
+    ]
+
+###############################################################################################
+#define functions
+def add_country(df, country_dict):
+    sample_id = df.name
+    df['Country'] = country_dict[sample_id]
+
+def add_status(df, urban_rural_dict):
+    sample_id = df.name
+    df['Sewage_status'] = urban_rural_dict[sample_id]
+
+def add_name(df, sample_id):
+    df['sample_id'] = sample_id
+
+def drop_zeros(df):
+    df.loc[~(df==0).all(axis=1)]
+    return df
+
+def create_top_15_plot(df, sample_id):
+    fig1, ax = plt.subplots(10,5)
+    df = df.sort_values('#clr_value',ascending=False).head(15)
+    ax = df.plot(x = '#name',kind='barh', legend=False, color ='#5aa9a2')
+    ax.set_xlabel('CLR')
+    ax.set_ylabel('Species')
+    plt.setp(ax.get_xticklabels(), horizontalalignment='right')
+    plt.title('Sample {}: Pathogens with highest FPKM (n=15)'.format(sample_id))
+    plt.tight_layout()
+    plt.savefig(path + "plots/{}_species_top15_clr_bar.svg".format(sample_id))
+
+def divide_with_sample_size(row):
+    if row['Country'] == 'Ethiopia':
+        new_clr = row['#clr_value']/6
+    if row['Country'] == 'Nigeria':
+        new_clr = row['#clr_value']/6
+    if row['Country'] == 'Tanzania':
+        new_clr = row['#clr_value']/2
+    if row['Country'] == 'Mozambique':
+        new_clr = row['#clr_value']/7
+    return new_clr
+
+
+new_dfs = []
+for pandas_df in list_of_pandas:
+    sample_id = pandas_df.name
+    #pandas_df['std_err'] = pandas_df['#clr_value'].std()
+    add_country(pandas_df, country_dict)
+    add_status(pandas_df, urban_rural_dict)
+    add_name(pandas_df, sample_id)
+    new_df = drop_zeros(pandas_df)
+    #create_top_15_plot(new_df, sample_id)
+    new_dfs.append(new_df)
+
+"""
+#plot frequency for Mozambique
+merged_df = pd.concat(i for i in new_dfs)
+subset_df = merged_df.loc[merged_df['Country'] == 'Mozambique']
+
+fig1, ax = plt.subplots(10,25)
+subset_df = subset_df.sort_values('#clr_value',ascending=True).tail(30)
+ax = subset_df.plot(x = '#name',kind='barh', legend=False, color ='#5aa9a2')
+ax.set_ylabel('Virulence factor')
+ax.set_xlabel('CLR')
+plt.setp(ax.get_xticklabels(), horizontalalignment='right')
+plt.title('Virulence factors in Tanzanian samples (n=2)')
+#plt.tight_layout()
+plt.show()
+#plt.savefig(path + "plots/{}_species_top15_clr_bar.svg".format(sample_id))
+
+"""
+#PLOT HEATMAPS
+
+merged_df = pd.concat(i for i in new_dfs)
+#tanzania = {'#name': 'vasI', '#clr_value': 0, 'Country': 'Tanzania'}
+#merged_df = merged_df.append(tanzania, ignore_index = True)
+
+#df_merged_top_30 = merged_df.head(30).sort_values(by='#clr_value')
+#subset_df = merged_df.loc[merged_df['#name'].isin(selected_vfs)]
+
+
+heatmap_df = merged_df[['#name','#clr_value','Country']]
+heatmap_df = heatmap_df.groupby(by=["Country",'#name'], dropna=False).sum()
+heatmap_df = heatmap_df.pivot_table(index=['Country'], columns=['#name'], values='#clr_value').fillna(0)
+
+f, ax = plt.subplots(1, figsize=(20,5))
+ax = sns.heatmap(heatmap_df, annot=True)
+#ax.invert_yaxis() 
+
+ax.set_ylabel("Country")
+ax.set_xlabel("Virulence factor")
+plt.title('CLR heatmap')
+# shot plot
+plt.show()
+
+"""
+#PLOT RELATIVE ABUNDANCE FOR ORGANISM AND SEWAGE STATUS
+merged_df = pd.concat(i for i in new_dfs)
+
+tanzania1 = {'#name': 'vasI', '#clr_value': 0, 'Country': 'Tanzania', 'Sewage_status': 'Urban'}
+tanzania2 = {'#name': 'vasI', '#clr_value': 0, 'Country': 'Tanzania', 'Sewage_status': 'Rural'}
+merged_df = merged_df.append(tanzania1, ignore_index = True)
+merged_df = merged_df.append(tanzania2, ignore_index = True)
+df_merged_top_30 = merged_df.sort_values(by='#clr_value', ascending=False)
+#subset_df = merged_df.loc[merged_df['#name'].isin(selected_vfs)]
+#df_merged_top_30 = df_merged_top_30.head(100)
+
+sample_df = df_merged_top_30.groupby(by=["Country",'#name','Sewage_status'], dropna=False).sum()
+sample_df = sample_df.pivot_table(index=['#name'], columns=['Country','Sewage_status'], values='#clr_value').fillna(0)
+sample_df = sample_df.T
+
+f, ax = plt.subplots(1, figsize=(10,10))
+
+ax = sample_df.plot.bar(title = 'Absolute abundance of virulence factors stratified by country and sewage status',
+    legend = False,
+    figsize = (10,10),
+    rot=45)
+plt.setp(ax.xaxis.get_majorticklabels(), ha='right')
+
+# Set the ticks to be first names
+#plt.xticks(tick_pos/2, subset_df['#name'])
+ax.set_ylabel("CLR")
+ax.set_xlabel("Country and sewage status")
+#ax.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1)
+
+
+# shot plot
+plt.show()
+
+"""
+"""
+#PLOT RELATIVE ABUNDANCE FOR COUNTRY AND SEWAGE STATUS
+merged_df = pd.concat(i for i in new_dfs)
+pathogens = ['Escherichia coli','Vibrio cholerae','Salmonella enterica','Shigella sonnei','Campylobacter jejuni','Entamoeba histolytica','Staphylococcus aureus']
+subset_df = merged_df.loc[merged_df['#name'].isin(pathogens_SR)]
+sample_df = subset_df.groupby(by=["Country",'#name','Sewage_status'], dropna=False).sum()
+sample_df = sample_df.pivot_table(index=['Country'], columns=['#name','Sewage_status'], values='#clr_value').fillna(0)
+sample_df = sample_df.T
+
+f, ax = plt.subplots()
+
+ax = sample_df.plot.bar(title = 'Absolute abundance of FBD-causing pathogens stratified by country and sewage status',
+    legend = False,
+    figsize = (10,5),
+    rot=45)
+plt.setp(ax.xaxis.get_majorticklabels(), ha='right')
+
+# Set the ticks to be first names
+#plt.xticks(tick_pos/2, subset_df['#name'])
+ax.set_ylabel("CLR")
+ax.set_xlabel("Country and sewage status")
+ax.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1)
+
+
+# shot plot
+plt.show()
+"""
+"""
+#PLOT RELATIVE ABUNDANCE FOR COUNTRY AND SEWAGE STATUS - WITH ERROR BARS
+merged_df = pd.concat(i for i in new_dfs)
+subset_df = merged_df.loc[merged_df['#name'].isin(selected_vfs)]
+
+subset_df['#clr_value'] = subset_df.apply(lambda x: divide_with_sample_size(x), axis=1)
+sample_df = subset_df.groupby(by=["Country",'#name','Sewage_status'], dropna=False).sum()
+std_list = sample_df.groupby(by=['#name'], dropna=False).std().rename(columns={'#clr_value':'stderr'})
+
+total_merged_df = sample_df.join(std_list).fillna(0)
+
+sample_df = total_merged_df.pivot_table(index=['#name'], columns=['Country','Sewage_status'], values='#clr_value').fillna(0)
+#sample_df = total_merged_df.pivot_table(index=['Country'], columns=['#name','Sewage_status'], values='#clr_value').fillna(0)
+
+sample_df = sample_df.T
+
+#stderrs
+yerr = total_merged_df.pivot_table(index=['Country'], columns=['#name'], values='stderr').fillna(0) #['#clr_value','stderr']
+#yerr = yerr.T
+
+test = yerr.unstack(level=0).values.T
+#sample_df = sample_df.pivot_table(index=['Country'], columns=['#name','Sewage_status'], values='#clr_value').fillna(0)
+#sample_df = sample_df.T
+
+
+#merged_df = merged_df.groupby(by=["Country","Sewage_status",'#name'], dropna=False).sum()
+
+f, ax = plt.subplots(1)
+
+
+ax = sample_df.plot.bar(title = 'Absolute abundance of FBD-causing pathogens stratified by country and sewage status',
+    legend = False,
+    figsize = (10,5),
+    rot=45)
+plt.setp(ax.xaxis.get_majorticklabels(), ha='right')
+
+#remove below this 
+
+
+
+#sewage_df = sewage_df.T
+#ax = sewage_df.plot.bar(title = 'Absolute abundance of FBD-causing pathogens stratified by country',
+#    figsize = (22,10),
+#    legend = False,
+#    yerr = yerr,
+#    capsize=4,
+#    #error_kw=dict(ecolor='k'),
+#    rot=0)
+
+ax.set_ylabel("CLR")
+ax.set_xlabel("Country, Sewage status")
+ax.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1)
+
+# shot plot
+plt.show()
+"""
+"""
+#RELATIVE ABUNDANCE FOR COUNTRY
+merged_df = pd.concat(i for i in new_dfs)
+pathogens = ['Escherichia coli','Vibrio cholerae','Salmonella enterica','Shigella sonnei','Campylobacter jejuni','Entamoeba histolytica','Staphylococcus aureus']
+subset_df = merged_df.loc[merged_df['#name'].isin(pathogens)]
+sample_df = subset_df.groupby(by=["Country",'#name','Sewage_status'], dropna=False).sum()
+sample_df = sample_df.pivot_table(index=['Country'], columns=['#name'], values='#clr_value').fillna(0)
+
+f, ax = plt.subplots(1, figsize=(10,5))
+ax = sample_df.plot.bar(title = 'Absolute abundance of FBD-causing pathogens stratified by country',
+    figsize = (11,10),
+    legend = False,
+    rot=0)
+# Set the ticks to be first names
+#plt.xticks(tick_pos/2, subset_df['#name'])
+ax.set_ylabel("CLR")
+ax.set_xlabel("Country")
+ax.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1)
+#plt.title('Absolute abundance of FBD pathogens stratified by country')
+
+# shot plot
+plt.show()
+"""
+"""
+# RELATIVE ABUNDANCE FOR COUNTRY -  ALL PATHOGENS
+
+
+merged_df = pd.concat(i for i in new_dfs)
+subset_df = merged_df.loc[merged_df['#name'].isin(pathogens_SR)]
+
+merged_df['#clr_value'] = merged_df.apply(lambda x: divide_with_sample_size(x), axis=1)
+merged_df = merged_df.groupby(by=["Country","Sewage_status",'#name'], dropna=False).sum()
+
+
+std_list = merged_df.groupby(by=['#name'], dropna=False).std().rename(columns={'#clr_value':'stderr'})
+total_merged_df = merged_df.join(std_list).fillna(0)
+ 
+
+#values
+sewage_df = total_merged_df.pivot_table(index=['Country'], columns=['#name'], values='#clr_value').fillna(0) #['#clr_value','stderr']
+
+#stderrs
+yerr = total_merged_df.pivot_table(index=['Country'], columns=['#name'], values='stderr').fillna(0) #['#clr_value','stderr']
+
+f, ax = plt.subplots(1)
+
+#sewage_df = sewage_df.T
+ax = sewage_df.plot.bar(title = 'Absolute abundance of FBD-causing pathogens stratified by country',
+    figsize = (22,10),
+    legend = False,
+    yerr = yerr,
+    capsize=4,
+    #error_kw=dict(ecolor='k'),
+    rot=0)
+
+ax.set_ylabel("CLR")
+ax.set_xlabel("Country")
+#ax.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1)
+
+# shot plot
+plt.show()
+"""
+"""
+# RELATIVE ABUNDANCE FOR COUNTRY -  ALL PATHOGENS
+merged_df = pd.concat(i for i in new_dfs)
+sample_df = merged_df[merged_df['#clr_value'] > 0]
+sample_df = sample_df.groupby(by=["Country",'#name','Sewage_status'], dropna=False).sum()
+sample_df = sample_df.pivot_table(index=['Country'], columns=['#name'], values='#clr_value').fillna(0)
+
+
+
+f, ax = plt.subplots()
+
+ax = sample_df.plot.bar(title = 'Absolute abundance of FBD-causing pathogens stratified by country',
+    figsize = (22,12),
+    legend = False,
+    rot=0)
+# Set the ticks to be first names
+#plt.xticks(tick_pos/2, subset_df['#name'])
+ax.set_ylabel("CLR")
+ax.set_xlabel("Country")
+ax.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1)
+#plt.title('Absolute abundance of FBD pathogens stratified by country')
+
+# shot plot
+plt.show()
+"""
+"""
+#RELATIVE DISTRIBUTION FOR SEWAGE STATUS - NO ERROR BARS
+merged_df = pd.concat(i for i in new_dfs)
+pathogens = ['Escherichia coli','Vibrio cholerae','Salmonella enterica','Shigella sonnei','Campylobacter jejuni','Entamoeba histolytica','Staphylococcus aureus']
+subset_df = merged_df.loc[merged_df['#name'].isin(pathogens)]
+sewage_df = subset_df.groupby(by=["Sewage_status",'#name'], dropna=False).sum()
+sewage_df = sewage_df.pivot_table(index=['Sewage_status'], columns=['#name'], values='#clr_value').fillna(0)
+
+f, ax = plt.subplots(1)
+
+#sewage_df = sewage_df.T
+ax = sewage_df.plot.bar(title = 'Absolute abundance of FBD-causing pathogens stratified by sewage satus',
+    figsize = (11,10),
+    legend = False,
+    rot=0)
+
+ax.set_ylabel("CLR")
+ax.set_xlabel("Sewage status")
+ax.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1)
+
+# shot plot
+plt.show()
+"""
+"""
+#RELATIVE DISTRIBUTION FOR SEWAGE STATUS - CHOSEN PATHOGENS
+merged_df = pd.concat(i for i in new_dfs)
+subset_df = merged_df.loc[merged_df['#name'].isin(pathogens)]
+merged_df = merged_df.groupby(by=["Sewage_status",'#name'], dropna=False).sum()
+std_list = merged_df.groupby(by=['#name'], dropna=False).std().rename(columns={'#clr_value':'stderr'})
+total_merged_df = merged_df.join(std_list).fillna(0)
+ 
+
+#values
+sewage_df = total_merged_df.pivot_table(index=['Sewage_status'], columns=['#name'], values='#clr_value').fillna(0) #['#clr_value','stderr']
+
+#stderrs
+yerr = total_merged_df.pivot_table(index=['Sewage_status'], columns=['#name'], values='stderr').fillna(0) #['#clr_value','stderr']
+
+
+#sewage_df = merged_df.pivot_table(index=['Sewage_status'], columns=['#name'], values=['#clr_value']).fillna(0) #['#clr_value','stderr']
+#sewage_df = sewage_df.pivot_table(index=['Sewage_status'], columns=['#name'], values='#clr_value').fillna(0) #['#clr_value','stderr']
+
+#yerr = std_list.T.fillna(0)
+#yerr_list = std_list.T.fillna(0).to_numpy()
+#yerr = std_list[['stderr']].to_numpy().T
+#test_df = pd.concat([sewage_df,yerr])
+
+f, ax = plt.subplots(1)
+
+#sewage_df = sewage_df.T
+ax = sewage_df.plot.bar(title = 'Absolute abundance of FBD-causing pathogens stratified by sewage satus',
+    figsize = (22,10),
+    legend = False,
+    yerr = yerr,
+    capsize=4,
+    #error_kw=dict(ecolor='k'),
+    rot=0)
+
+ax.set_ylabel("CLR")
+ax.set_xlabel("Sewage status")
+ax.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1)
+
+# shot plot
+plt.show()
+"""
+"""
+#RELATIVE DISTRIBUTION FOR SEWAGE STATUS - ALL PATHOGENS
+merged_df = pd.concat(i for i in new_dfs)
+merged_df = merged_df.loc[merged_df['#name'].isin(selected_vfs)]
+
+total_df = merged_df.copy()
+merged_df = merged_df.groupby(by=["Sewage_status",'#name'], dropna=False).sum()
+std_list = merged_df.groupby(by=['#name'], dropna=False).std().rename(columns={'#clr_value':'stderr'})
+total_merged_df = merged_df.join(std_list).fillna(0)
+ 
+
+#values
+sewage_df = total_merged_df.pivot_table(index=['Sewage_status'], columns=['#name'], values='#clr_value').fillna(0) #['#clr_value','stderr']
+
+#stderrs
+yerr = total_merged_df.pivot_table(index=['Sewage_status'], columns=['#name'], values='stderr').fillna(0) #['#clr_value','stderr']
+
+
+#sewage_df = merged_df.pivot_table(index=['Sewage_status'], columns=['#name'], values=['#clr_value']).fillna(0) #['#clr_value','stderr']
+#sewage_df = sewage_df.pivot_table(index=['Sewage_status'], columns=['#name'], values='#clr_value').fillna(0) #['#clr_value','stderr']
+
+#yerr = std_list.T.fillna(0)
+#yerr_list = std_list.T.fillna(0).to_numpy()
+#yerr = std_list[['stderr']].to_numpy().T
+#test_df = pd.concat([sewage_df,yerr])
+
+f, ax = plt.subplots(1)
+
+#sewage_df = sewage_df.T
+ax = sewage_df.plot.bar(title = 'Absolute abundance of FBD-causing pathogens stratified by sewage satus',
+    figsize = (5,5),
+    legend = False,
+    yerr = yerr,
+    capsize=4,
+    #error_kw=dict(ecolor='k'),
+    rot=0)
+
+ax.set_ylabel("CLR")
+ax.set_xlabel("Sewage status")
+ax.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1)
+
+# shot plot
+plt.show()
+"""
+"""
+#BOXPLOT SEWAGE STATUS
+merged_df = pd.concat(i for i in new_dfs)
+pathogens = ['Escherichia coli','Vibrio cholerae','Salmonella enterica','Shigella sonnei','Campylobacter jejuni','Entamoeba histolytica','Staphylococcus aureus']
+subset_df = merged_df.loc[merged_df['#name'].isin(pathogens)]
+sewage_df = subset_df.groupby(by=["Sewage_status",'#name'], dropna=False).sum()
+sewage_df = sewage_df.pivot_table(index=['Sewage_status'], columns=['#name'], values='#clr_value').fillna(0)
+
+f, ax = plt.subplots(1)
+
+#sewage_df = sewage_df.T
+ax = sewage_df.boxplot(rot=45)
+#ax = sewage_df.plot.bar(title = 'Absolute abundance of FBD-causing pathogens stratified by sewage satus',
+#    figsize = (11,10),
+#    legend = False,
+#    rot=0)
+plt.title('Absolute abundance of FBD-causing pathogens stratified by organism')
+plt.setp(ax.xaxis.get_majorticklabels(), ha='right')
+
+ax.set_ylabel("CLR")
+ax.set_xlabel("Organism")
+
+# shot plot
+plt.show()
+
+sewage_df = merged_df.groupby(by=["Sewage_status",'#name'], dropna=False).sum()
+sewage_df = sewage_df.pivot_table(index=['Sewage_status'], columns=['#name'], values='#clr_value').fillna(0)
+
+f, ax = plt.subplots(1)
+
+#sewage_df = sewage_df.T
+ax = sewage_df.boxplot(rot=45, figsize = (30,8))
+#ax = sewage_df.plot.bar(title = 'Absolute abundance of FBD-causing pathogens stratified by sewage satus',
+#    figsize = (11,10),
+#    legend = False,
+#    rot=0)
+plt.title('Absolute abundance of FBD-causing pathogens stratified by organism')
+plt.setp(ax.xaxis.get_majorticklabels(), ha='right')
+
+ax.set_ylabel("CLR")
+ax.set_xlabel("Organism")
+
+# shot plot
+plt.show()
+"""
+
+######## ABSOLUTE ABUNDANCE OF ALL PATHOGENS
+"""
+df_merged = functools.reduce(lambda left,right: pd.merge(left,right,on=['#name'],how='outer'), new_dfs)
+#df_merged_top_30 = df_merged.head(30).sort_values(by='#clr_value')
+
+
+
+fig1, ax = plt.subplots()
+#Normal barplot
+ax = df_merged.plot(x = '#name',
+    kind = 'barh',
+    stacked = True,
+    title = 'Absolute abundance of virulence factors',
+    mark_right = True,
+    figsize = (13,12),
+    legend = False)
+
+#ax.legend(bbox_to_anchor=(1,1), labels = ['1009183','1009184','1009185','1009186','1009188','1009189','1009193','1009195','1009196','1009200','1009202'])
+
+ax.legend(bbox_to_anchor=(1,1), labels = ['1009182','1009183','1009184','1009185','1009186','1009187','1009188','1009189','1009190','1009191','1009192','1009193','1009194','1009195','1009196','1009197','1009198','1009200','1009201','1009202','1009203'])
+ax.set_ylabel('Species')
+ax.set_xlabel('CLR')
+plt.show()
+#plt.tight_layout()
+#plt.savefig(path + '/plots/abs_adundance_pathogens_all.svg')
+
+"""
+
+
