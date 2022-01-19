@@ -1,0 +1,131 @@
+list_of_pandas = [vf_1009182, vf_1009183, vf_1009184, vf_1009185, vf_1009186, vf_1009187, vf_1009188, vf_1009189, vf_1009190, vf_1009191, vf_1009192, vf_1009193, vf_1009194, vf_1009195, vf_1009196, vf_1009197, vf_1009198, vf_1009200, vf_1009201, vf_1009202, vf_1009203]
+
+###############################################################################################
+# Add information to dataframes
+country_dict = {
+    '1009182': 'Tanzania',
+    '1009183': 'Nigeria',
+    '1009184': 'Nigeria',
+    '1009185': 'Ethiopia',
+    '1009186': 'Ethiopia',
+    '1009187': 'Mozambique',
+    '1009188': 'Mozambique',
+    '1009189': 'Mozambique',
+    '1009190': 'Mozambique',
+    '1009191': 'Tanzania',
+    '1009192': 'Nigeria',
+    '1009193': 'Nigeria',
+    '1009194': 'Ethiopia',
+    '1009195': 'Ethiopia',
+    '1009196': 'Mozambique',
+    '1009197': 'Mozambique',
+    '1009198': 'Mozambique',
+    '1009200': 'Nigeria',
+    '1009201': 'Nigeria',
+    '1009202': 'Ethiopia',
+    '1009203': 'Ethiopia'
+    }
+
+urban_rural_dict = {
+    '1009182': 'Urban',
+    '1009183': 'Urban',
+    '1009184': 'Rural',
+    '1009185': 'Urban',
+    '1009186': 'Rural',
+    '1009187': 'Rural',
+    '1009188': 'Rural',
+    '1009189': 'Urban',
+    '1009190': 'Urban',
+    '1009191': 'Rural',
+    '1009192': 'Urban',
+    '1009193': 'Rural',
+    '1009194': 'Rural',
+    '1009195': 'Urban',
+    '1009196': 'Rural',
+    '1009197': 'Rural',
+    '1009198': 'Urban',
+    '1009200': 'Urban',
+    '1009201': 'Rural',
+    '1009202': 'Urban',
+    '1009203': 'Rural'
+    }
+
+selected_vfs = [
+    'stx1A',
+    'stx1B',
+    'stx2A',
+    'stx2B',
+    'stx2d1A',
+    'stx2dB',
+    'stx2eA',
+    'stx2eB',
+    'stx2fA',
+    'stx2fB',
+    'eae',
+    'eltA',
+    'ipaH',
+    ]
+
+expec_vfs = ['pap', 'sfa/foc', 'afa/dra', 'iuc/iut', 'kpsMTII']
+
+###############################################################################################
+#define functions
+def add_country(df, country_dict):
+    sample_id = df.name
+    df['Country'] = country_dict[sample_id]
+
+def add_status(df, urban_rural_dict):
+    sample_id = df.name
+    df['Sewage_status'] = urban_rural_dict[sample_id]
+
+def add_name(df, sample_id):
+    df['sample_id'] = sample_id
+
+def drop_zeros(df):
+    df.loc[~(df==0).all(axis=1)]
+    return df
+
+def divide_with_sample_size(row):
+    if row['Country'] == 'Ethiopia':
+        new_clr = row['#clr_value']/6
+    if row['Country'] == 'Nigeria':
+        new_clr = row['#clr_value']/6
+    if row['Country'] == 'Tanzania':
+        new_clr = row['#clr_value']/2
+    if row['Country'] == 'Mozambique':
+        new_clr = row['#clr_value']/7
+    return new_clr
+
+
+new_dfs = []
+for pandas_df in list_of_pandas:
+    sample_id = pandas_df.name
+    #pandas_df['std_err'] = pandas_df['#clr_value'].std()
+    add_country(pandas_df, country_dict)
+    add_status(pandas_df, urban_rural_dict)
+    add_name(pandas_df, sample_id)
+    new_df = drop_zeros(pandas_df)
+    #create_top_15_plot(new_df, sample_id)
+    new_dfs.append(new_df)
+
+
+#PLOT HEATMAPS
+merged_df = pd.concat(i for i in new_dfs)
+#df_merged_top_30 = merged_df.sort_values(by='#clr_value')
+merged_df['#clr_value'] = merged_df.apply(lambda x: divide_with_sample_size(x), axis=1)
+subset_df = merged_df.loc[merged_df['#name'].isin(selected_vfs)]
+heatmap_df = subset_df[['#name','#clr_value','Country']]
+heatmap_df = heatmap_df.groupby(by=["Country",'#name'], dropna=False).sum()
+heatmap_df = heatmap_df.pivot_table(index=['Country'], columns=['#name'], values='#clr_value').fillna(0)
+
+f, ax = plt.subplots(1, figsize=(5,5))
+ax = sns.heatmap(heatmap_df, annot=True)
+plt.yticks(rotation=0)  
+#ax.invert_yaxis() 
+
+ax.set_ylabel("Country")
+ax.set_xlabel("VF")
+plt.title('Abundance of E. coli VFs in sewage samples')
+
+plt.show()
+sys.exit()
